@@ -1,0 +1,34 @@
+﻿CHECKLIST GATE REVIEW CHO QC FRESHER,,,,,,
+"Dùng checklist này trước khi chuyển gate. Nếu item chưa pass, không nên chạy bước tiếp theo trừ khi lead cho phép và có risk note rõ.",,,,,,
+,,,,,,
+Gate,Checklist item cho fresher,Cách kiểm tra cụ thể,Evidence/file,PASS criteria,Rủi ro nếu bỏ qua,Gợi ý xử lý nếu chưa pass
+Gate 0 - Before run,Đúng ticket parent/sub-ticket,Đối chiếu Jira với path local và lệnh command.,Jira; qc_test_basis/themes/...,Tên ticket trong command khớp folder.,"Artifact ghi sai chỗ, lẫn scope.",Sửa path/lệnh trước khi chạy.
+Gate 0 - Before run,SPEC đúng version,"Mở SPEC_vi.md/SPEC.md, kiểm tra heading, ngày/version nếu có.",SPEC_vi.md/SPEC.md,SPEC đúng ticket/feature.,AI phân tích theo requirement cũ.,Xin bản SPEC mới hoặc ghi risk.
+Gate 0 - Before run,System overview sẵn sàng,"Kiểm tra feature-screen mapping, email flow, specs, screen-specs, glossary.",qc_requirement; specs; GLOSSARY,Có file hoặc biết file nào thiếu.,Bỏ sót impact gián tiếp.,Update file hoặc log limitation.
+Gate 1 - Figma,Figma URL hợp lệ,"Mở link, kiểm tra là figma.com/design, đúng node.",Figma URL,Link mở đúng screen/flow.,Extract sai/thiếu UI.,Lấy lại node URL đúng.
+Gate 1 - Figma,Output không phải screenshot,"Kiểm tra chỉ có markdown, không tạo folder ảnh.",figma_design_<TICKET>.md,Metadata text + Figma Node URL.,"Không trace được, khó review.","Xóa output sai, chạy lại theo rule."
+Gate 1 - Figma,Đủ screen/component/action chính,Đối chiếu Figma trực tiếp với bảng 7 cột.,figma_design_<TICKET>.md,Không thiếu field/action critical.,B2 hiểu sai UI.,Raise issue hoặc chạy lại node đúng.
+Gate 1 - Figma,Flag đã review,"Tìm [MISSING-GLOSSARY-TERM], [UNKNOWN-COMPONENT-TYPE], [MISSING-ACTION].",figma_design_<TICKET>.md,Không có flag blocker.,Sai term/component/action.,Cập nhật glossary hoặc hỏi BA/BRSE.
+Gate 2 - Analysis,step1_context có System Overview Snapshot,Đọc section index/specs/screen-specs grep.,step1_context.md,Có nguồn đã đọc và liên quan scope.,AI phân tích isolated.,"Bổ sung file mapping/spec, re-run B2."
+Gate 2 - Analysis,Map 1 SPEC ↔ BDD đủ,Đối chiếu heading SPEC với Map 1.,step0_breakdown.md,Không có [MISSING-COVERAGE] blocker.,Bỏ sót requirement.,Log QA hoặc re-run sau khi bổ sung SPEC.
+Gate 2 - Analysis,Map 2 Screen×Action×Actor đủ,Check screen/action critical có BDD trace.,step0_breakdown.md,Action chính được cover.,Bỏ sót UI flow.,Cập nhật Figma/SPEC hoặc log QA.
+Gate 2 - Analysis,Impact A Direct rõ,Đọc danh sách rule/screen/API thay đổi trực tiếp.,step0_breakdown.md,Có source và scope rõ.,TCD sai trọng tâm.,Yêu cầu AI phân tích lại hoặc bổ sung source.
+Gate 2 - Analysis,Impact B Indirect rõ,Check reverse mapping feature dùng chung.,step0_breakdown.md; qc_feature_screen_mapping.md,Candidate regression rõ hoặc đã QA.,Leakage ở màn hình liên quan.,Log QA [MISSING-IMPACT-ANALYSIS].
+Gate 2 - Analysis,Impact C Workflow rõ,Check status/email/upstream/downstream.,step0_breakdown.md; qc_email_flow.md,Workflow impact có/không có đều nêu rõ.,Bỏ sót email/status/API chain.,Log QA hoặc cập nhật email flow.
+Gate 2 - Analysis,Obsoleted candidate không bị tự chốt,Check D/E và TAG_SCOPE.,step0_breakdown.md; step2_qa.md,OBSOLETED chỉ sau BRSE confirm.,Xóa/bỏ chạy TC cũ sai.,Log QA [POSSIBLE-OBSOLETED].
+Gate 2 - Jira,QA OPEN đã log lên Jira,So QA OPEN trong step2_qa với Jira comment/sub-task.,step2_qa.md; Jira,Không thiếu QA critical.,BRSE không thấy câu hỏi.,Log bổ sung.
+Gate 2 - Jira,BRSE/Dev trả lời đủ rõ,Kiểm tra có ANSWERED/TAG_SCOPE_FINAL nếu cần.,Jira,Answer đủ để update scope.,AI/local update sai vì answer mơ hồ.,Hỏi lại trên Jira.
+Gate 2 - Jira,Sync local sau Jira,Mở step2_qa và step0 sau sync.,step2_qa.md; step0_breakdown.md,QA CLOSED; TAG_SCOPE update đúng.,B3 đọc dữ liệu cũ.,Yêu cầu sync/re-analysis lại.
+Gate 2 - Before B3,Không còn QA critical OPEN,"Filter [MISSING-IMPACT-ANALYSIS], [POSSIBLE-OBSOLETED].",step2_qa.md,100% CLOSED/ANSWERED.,TCD/TC sai hàng loạt.,Dừng B3 hoặc ghi risk nếu lead cho chạy.
+Gate 3 - TCD,step3_tcd đúng schema,Check header TCD_SCHEMA_VERSION và 18 cột.,step3_tcd.md,"Có IMPACT_REF, AUTOMATION_FEASIBILITY, E2E_FLAG.",B4 không đủ input.,Re-run B3.
+Gate 3 - TCD,Có đủ scenario levels,"Check [BDD], [UI-COVERAGE], [IMPACT-INDIRECT], [IMPACT-WORKFLOW].",step3_tcd.md,Level phù hợp với scope impact.,Bỏ sót regression/workflow test.,Yêu cầu AI bổ sung/re-run.
+Gate 3 - TCD,Coverage Matrix 3 tầng pass,Đọc matrix và self-check R24.,step3_tcd.md,Không có tầng quan trọng bị trắng.,Coverage hở.,Log QA mới hoặc re-run B3.
+Gate 3 - TCD,Automation/E2E flag hợp lý,Sampling case Auto/Semi/Manual/E2E.,step3_tcd.md,Phân loại có lý do.,Automation plan sai.,Điều chỉnh rule hoặc review với automation QC.
+Gate 3 - Before B4,TCD đã được lead/user confirm,Có confirmation trong chat/Jira/note.,Review note,Approved hoặc issue list rõ.,Sinh TC từ TCD sai.,Chốt TCD trước.
+Gate 4 - TC,Đủ 6 output B4,Check danh sách file.,"step3_5*, step3_6*, step4*",Đủ file theo command.,Thiếu file để review/handoff.,Re-run B4/RESUME.
+Gate 4 - TC,Reuse map có 5 bảng,Mở step3_5_tc_reuse_map.,step3_5_tc_reuse_map.md,REGRESSION/OBSOLETED/NEW/CONFIRMATION/SKIPPED đầy đủ.,Duplicate hoặc bỏ sót TC cũ.,Review conflict log.
+Gate 4 - TC,Regression pool hợp lý,"Check Re-run Required, Coverage Gap, Priority.",step3_5_regression_pool.md,TC liên quan impact có priority.,Regression quá thiếu/quá thừa.,Sửa scope/review với lead.
+Gate 4 - TC,Obsoleted chỉ là candidate,Check có BRSE Confirm/Proposed Action.,step3_5_obsoleted_candidates.md,Không sửa TC_v2 trực tiếp.,Mất test coverage cũ.,Chờ confirm trước khi update baseline.
+Gate 4 - TC,TC executable,"Sampling TC chính: precondition, data, step, expected.",step4_tc_<module>.md,QC có thể chạy được mà không hỏi lại quá nhiều.,Team mất công sửa TC.,Re-gen module hoặc edit TC.
+Gate 4 - TC,Automation summary dùng được,Check Auto/Semi/Manual + E2E list.,step3_6_automation_e2e_summary.md,Có candidate hợp lý.,Chọn sai automation scope.,Review với automation lead.
+Handoff,Có handoff note,"Tổng hợp scope, files, open risk, next action.",Handoff note/email/Jira comment,Team biết file nào là final.,"Bàn giao rối, dùng nhầm file.",Gửi note ngắn kèm link file.

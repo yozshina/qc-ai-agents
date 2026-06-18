@@ -1,0 +1,11 @@
+# Converted from Plan_Test_QC_Process_AI_fresher_step_by_step(eContract skills).csv
+
+- SKILL ĐANG CHẠY CHO DỰ ÁN eContract | 
+- "Trạng thái chung: đang áp dụng thực tế |  vừa chạy vừa đánh giá và custom thêm; chưa nên coi là baseline cuối cho mọi dự án nếu chưa nghiệm thu kết quả." | 
+-  | 
+- Nhóm | Skill / Capability | Gắn với bước | Input phụ thuộc | Output chịu ảnh hưởng | Trạng thái eContract | Điểm đang cần đánh giá/custom
+- Figma extraction | figma_design_extractor.md | B1. Extract Figma Design | "Figma URL |  TICKET_ID |  Figma MCP auth" | screens/figma_design_<TICKET>.md | Đang dùng khi ticket có Figma | Độ đủ của thông tin screen/field/state/action; format 7 cột; khả năng tái dùng cho QC review.
+- Scenario & impact analysis | user_scenario_breakdown_uc_260511.md | B2. Analyze User Scenario & Impact | "SPEC_vi.md/SPEC.md |  specs |  screen-specs |  mapping |  email flow |  glossary |  figma design" | "step0_breakdown.md |  step1_context.md |  step2_qa.md" | Đang chạy và custom mạnh nhất | "Độ chính xác của Direct/Indirect impact |  reverse map |  workflow cross-check |  OBSOLETED detection |  QA OPEN quality."
+- Jira QA workflow | Atlassian MCP Log/Sync QA | B2.1–B2.2 Jira branch | "step2_qa.md |  Jira ticket |  BRSE/Dev answers" | Jira sub-task/comment; step2_qa.md CLOSED; step0 TAG_SCOPE update | Đang dùng để đưa QA về Jira và sync lại local | Traceability giữa QA trên local và Jira; cách đóng QA; quy tắc chỉ gắn REGRESSION/OBSOLETED sau BRSE confirm.
+- Test condition design | test_condition_designer_uc_260511.md | B3. Generate Test Conditions | step0/step1/step2 đã đủ thông tin; system context; Figma nếu có | "step3_tcd.md |  Coverage Matrix 3 tầng |  Self-check R24" | Đang đánh giá theo output TCD thực tế | Coverage của 4 scenario level; tuân thủ 24 rules; tránh thiếu workflow/indirect impact.
+- Test case design | test_case_designer_uc_260511.md | B4. Generate Test Cases | "step3_tcd.md |  TC_v2 existing |  demo.md style" | "reuse map |  regression pool |  obsoleted candidates |  TC module/all |  automation E2E" | Đang custom để khớp style và dữ liệu eContract | Chất lượng schema 19 cột; reuse/duplicate control; obsoleted candidate accuracy; automation E2E candidate usefulness.
