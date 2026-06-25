@@ -1,0 +1,72 @@
+{
+  "_note": "Bản COPY từ common/config/project-config.json ngày 2026-06-25 (đợt tái cấu trúc Hybrid). Bản gốc tại common/config/ GIỮ NGUYÊN để pipeline cũ không gãy. Nội dung dưới giữ nguyên 100% bản gốc.",
+
+  "project": {
+    "id": "LKH",
+    "name": "Hệ thống quản lý dữ liệu Lakehouse",
+    "type": "Lakehouse / BI / Data Platform"
+  },
+  "figma": {
+    "base_url": "https://www.figma.com/design/Dk7KnsNNVmPAJKT0VmmOv5/H%E1%BB%87-th%E1%BB%91ng-qu%E1%BA%A3n-l%C3%BD-d%E1%BB%AF-li%E1%BB%87u-Lakehouse",
+    "default_node_id": "179603-8217",
+    "full_url": "https://www.figma.com/design/Dk7KnsNNVmPAJKT0VmmOv5/H%E1%BB%87-th%E1%BB%91ng-qu%E1%BA%A3n-l%C3%BD-d%E1%BB%AF-li%E1%BB%87u-Lakehouse?node-id=179603-8217&p=f&t=Oz4wxeYGZp1ULT5B-0",
+    "note": "Mỗi job chỉ định vùng node-id riêng trong input/figma-url.txt"
+  },
+  "paths": {
+    "jobs_root": "jobs/",
+    "templates": {
+      "tc":           "common/templates/tc-template.xlsx",
+      "qa":           "common/templates/qa-template.xlsx",
+      "checklist":    "common/templates/checklist-template.xlsx",
+      "excel_output": "common/templates/output-template.xlsx"
+    },
+    "knowledge_pipeline": "common/processes/knowledge-pipeline/",
+    "config": "common/config/project-config.json"
+  },
+  "domain": {
+    "type": "UI + Data Platform",
+    "impact_schema": {
+      "A_direct":   "Màn hình chức năng + field/rule + component UI bị sửa trực tiếp",
+      "B_indirect": "Màn hình/component khác dùng chung UI rule, bảng/dashboard hạ nguồn",
+      "C_workflow": "Chuỗi tương tác người dùng, navigation flow, data trigger sau submit"
+    },
+    "glossary": {
+      "common_rule": "Bộ quy tắc UI dùng chung: header, menu, input, button, icon, data grid",
+      "sprint":      "Đơn vị thời gian phát triển; sprint-14 là sprint hiện tại",
+      "data_grid":   "Bảng hiển thị dữ liệu dạng lưới có phân trang, sort, filter",
+      "KH":          "Khách hàng"
+    },
+    "ui_component_types": [
+      "header", "menu/navigation", "input-field", "button",
+      "icon", "data-grid", "modal", "toast/notification",
+      "breadcrumb", "tab", "dropdown", "date-picker",
+      "pagination", "tooltip", "badge", "loading-state"
+    ]
+  },
+  "risk_criteria": {
+    "HIGH": [
+      "Component dùng chung trên toàn hệ thống (header, menu, button primary)",
+      "Thay đổi behavior (không chỉ visual)",
+      "Ảnh hưởng flow nhập liệu hoặc submit dữ liệu"
+    ],
+    "MEDIUM": [
+      "Component dùng chung trong 1 module",
+      "Thay đổi visual không ảnh hưởng behavior"
+    ],
+    "LOW": [
+      "Component chỉ xuất hiện ở 1 màn hình",
+      "Thay đổi spacing, màu sắc thuần túy"
+    ]
+  },
+  "agent_rules": {
+    "never_delete":             true,
+    "never_overwrite_existing": true,
+    "never_overwrite_baseline": true,
+    "job_id_set_by":            "monitor",
+    "template_path_set_by":     "monitor",
+    "gate_decision_by":         "monitor",
+    "resume_from":              "jobs/{JOB_ID}/00_meta.md",
+    "qa_update_in_place":       true,
+    "versioning":               "by date in filename, not _v2 suffix"
+  }
+}
