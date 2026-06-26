@@ -1,9 +1,16 @@
 {
   "_note": "Config dự án C360 Dashboard. Các giá trị {…} hoặc đánh dấu CHỜ-MONITOR cần Monitor xác nhận/điền giá trị thật trước khi chạy B0. AI KHÔNG tự bịa thông tin domain.",
+  "_updated": "2026-06-26: bổ sung block 'figma' (URL về config theo comment Monitor) + trỏ tc_template về projects/C360/templates/.",
 
   "project_id": "C360",
   "project_name": "C360 Dashboard (CHỜ-MONITOR: tên đầy đủ chính thức)",
   "trust_level": 0,
+
+  "figma": {
+    "_note": "URL design lưu Ở ĐÂY (không lưu trong file input của job). File input job chỉ ghi vùng xử lý + node-id cụ thể của job đó để truy vết.",
+    "base_url": "CHỜ-MONITOR: dán URL Figma gốc của C360 nếu có",
+    "default_node_id": "CHỜ-MONITOR"
+  },
 
   "domain": {
     "type": "dashboard",
@@ -21,7 +28,7 @@
 
   "input": {
     "required": ["File mô tả yêu cầu dashboard (từ BA/PM/PO/KH)"],
-    "optional": ["Link design (Figma)", "File mapping dữ liệu / data dictionary của dashboard"],
+    "optional": ["File figma.md (vùng xử lý + node-id job)", "File mapping dữ liệu / data dictionary của dashboard"],
     "design_tool": "CHỜ-MONITOR: figma | none"
   },
 
@@ -39,7 +46,7 @@
   },
 
   "templates": {
-    "tc_template": "CHỜ-MONITOR: path tới TC template cho C360 (có thể tái dùng template Viettel hiện có)",
+    "tc_template": "projects/C360/templates/  (CHỜ-MONITOR: tạo template TC cho C360 — tham khảo template Viettel ở projects/LKH/templates/)",
     "qa_template": "CHỜ-MONITOR: path",
     "export_template": "CHỜ-MONITOR: path"
   },

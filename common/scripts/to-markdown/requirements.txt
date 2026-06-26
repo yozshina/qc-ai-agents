@@ -1,0 +1,5 @@
+# Thư viện cần cài cho to_markdown.py
+# Cài 1 lần: pip install -r common/scripts/to-markdown/requirements.txt
+# Hoặc: pip install "markitdown[all]"
+
+markitdown[all]>=0.1.6
