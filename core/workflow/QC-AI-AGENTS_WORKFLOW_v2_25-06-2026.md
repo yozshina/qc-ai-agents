@@ -19,6 +19,39 @@
 
 ---
 
+## ⛔ B-PRE — TIỀN ĐIỀU KIỆN MCP (BẮT BUỘC, CHẠY TRƯỚC MỌI BƯỚC)
+
+> **Luật tiên quyết Monitor chốt 2026-06-28.** Đây là bước CHẠY ĐẦU TIÊN, trước cả B0. Lý do: nếu MCP lỗi mà AI vẫn suy nghĩ/phân tích/đề xuất tiếp thì **tốn token vô nghĩa** và cho ra kết quả không có cơ sở.
+
+### Nguyên tắc
+**Phải KẾT NỐI ĐƯỢC mọi MCP mà job cần TRƯỚC, rồi mới được làm các tác vụ tiếp theo. MCP lỗi → DỪNG NGAY, KHÔNG suy nghĩ tiếp, KHÔNG phân tích tiếp, chỉ báo Monitor.**
+
+### Các bước B-PRE
+1. **Liệt kê MCP mà job cần** dựa trên `Tool:` của lệnh + loại input:
+   - `convert-md` hoặc input là file nặng → cần **filesystem MCP** (+ script convert).
+   - Input/design là Figma → cần **MCP Figma** (ưu tiên) hoặc **extension Chrome** (fallback).
+   - Ghi/đọc file repo → cần **filesystem MCP**.
+2. **Kiểm tra kết nối từng MCP** bằng 1 lệnh thử rẻ (vd: filesystem `list_allowed_directories`; Figma: gọi thử 1 truy vấn node; Chrome: `tabs_context`).
+3. **Phân nhánh:**
+   - ✅ Tất cả MCP cần thiết **kết nối OK** → mới sang B0.
+   - ❌ Bất kỳ MCP nào **lỗi/timeout/chưa kết nối** → **DỪNG NGAY**. Báo Monitor: MCP nào lỗi, cần làm gì (kết nối/đăng nhập/khởi động lại). **TUYỆT ĐỐI KHÔNG** đọc input, không phân tích, không suy luận, không đề xuất gì thêm cho tới khi MCP OK.
+4. **Nếu MCP rớt GIỮA CHỪNG** (đang ở B1–B5): áp dụng cùng luật — dừng ngay tại micro-step đó, ghi lại resume point, báo Monitor. Không tính toán thêm. Không re-run.
+
+### Vì sao tiên quyết
+- Tiết kiệm token: không phân tích trên dữ liệu chưa lấy được.
+- Tránh kết quả ảo: mọi phân tích phải dựa trên dữ liệu MCP thật, không phải phỏng đoán.
+- Rõ trách nhiệm: Monitor biết ngay phải xử lý hạ tầng (kết nối) trước, thay vì nhận một đống suy luận vô căn cứ.
+
+### Checklist B-PRE (AI tự xác nhận trước khi qua B0)
+```
+□ Đã liệt kê đúng các MCP job cần?
+□ Đã test kết nối từng MCP bằng 1 lệnh rẻ?
+□ Tất cả OK? → sang B0.
+□ Có cái nào lỗi? → DỪNG, báo Monitor, KHÔNG làm gì thêm.
+```
+
+---
+
 ## 00 — README & TRIẾT LÝ THIẾT KẾ
 
 ### Mục tiêu của workflow

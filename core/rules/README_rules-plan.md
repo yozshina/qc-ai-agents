@@ -4,7 +4,7 @@
 
 ## Vì sao tách rules ra khỏi file workflow core?
 
-File `qc-workflow_core_v3_2026-06-25.md` hiện gói TẤT CẢ trong 1 file (~780 dòng): vừa pipeline, vừa rule, vừa schema. Khi workflow lớn dần, các **rule chi tiết** nên tách thành file riêng để:
+File `core/workflow/QC-AI-AGENTS_WORKFLOW_v2_25-06-2026.md` hiện gói TẤT CẢ trong 1 file (~780 dòng): vừa pipeline, vừa rule, vừa schema. Khi workflow lớn dần, các **rule chi tiết** nên tách thành file riêng để:
 - Sửa 1 rule không phải đụng cả file workflow lớn (giảm rủi ro).
 - AI agent có thể nạp đúng rule cần cho từng bước (tiết kiệm context/token).
 - Mỗi rule có thể kaizen độc lập, có version riêng.

@@ -32,6 +32,15 @@
     "design_tool": "CHỜ-MONITOR: figma | none"
   },
 
+  "input_preprocessing": {
+    "_note": "Cấu hình RIÊNG của dự án về tiền xử lý input. Workflow lõi KHÔNG quy định việc này — mỗi dự án tự quyết tùy loại input của mình.",
+    "convert_to_markdown": true,
+    "rule": "Khi người dùng đưa input vào jobs/{JOB_ID}/input/: nếu file CHƯA phải .md (pdf/docx/xlsx/pptx/csv/ảnh...) thì CALL script convert sang .md trước khi AI đọc. Nếu file ĐÃ là .md thì BỎ QUA.",
+    "script": "common/scripts/to-markdown/to_markdown.py",
+    "call_example": "python common/scripts/to-markdown/to_markdown.py \"projects/C360/jobs/{JOB_ID}/input\"",
+    "safety": "Script chỉ tạo file .md mới, không xóa/sửa file gốc (theo core/LUAT_giao-thuc-xoa-va-ghi-de.md)."
+  },
+
   "risk_criteria": {
     "high_risk_areas": [
       "CHỜ-MONITOR: ví dụ — số liệu KPI tổng (sai số = sai báo cáo)",

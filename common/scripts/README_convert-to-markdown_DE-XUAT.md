@@ -1,74 +1,35 @@
-# Scripts — Convert mọi định dạng → Markdown (đề xuất sau khi search GitHub)
-> Trả lời comment Monitor: "cần thêm scripts convert nhiều định dạng sang MD, search GitHub xem có repo nào hỗ trợ, tránh viết nhiều script."
+# Scripts — Convert mọi định dạng → Markdown
+> Trạng thái: ✅ ĐÃ CHỐT & ĐÃ TRIỂN KHAI (không còn là đề xuất).
+> Hướng dẫn dùng chính thức: **`common/scripts/to-markdown/README.md`**. File này chỉ lưu lại bối cảnh quyết định.
 
 ---
 
-## Kết luận search: KHÔNG cần viết nhiều script. Dùng 1 thư viện duy nhất.
+## Đã chốt: dùng MarkItDown (Microsoft)
+https://github.com/microsoft/markitdown — MIT, mã nguồn mở, 1 thư viện cho 15+ định dạng (PDF, DOCX, XLSX, PPTX, HTML, CSV, JSON, image, ZIP...). Python ≥ 3.10, không cần GPU. Tối ưu token cho LLM.
 
-**MarkItDown (Microsoft)** — https://github.com/microsoft/markitdown
-- MIT license, mã nguồn mở, ~139k sao GitHub (06/2026).
-- Chuyển **15+ định dạng** → Markdown trong 1 API: PDF, DOCX, XLSX, PPTX, HTML, CSV, JSON, XML, image, audio, ZIP...
-- Không cần GPU. Python ≥ 3.10. ~12 giây / 100 trang.
-- Tối ưu cho LLM (giữ cấu trúc heading/table/list, ít token).
+→ Không phải viết nhiều script riêng. 1 thư viện xử lý tất cả.
 
-> Đây đúng mục tiêu Monitor: "mỗi job chỉ đưa file vào input → convert sang markdown trước → AI đọc markdown". MarkItDown thay thế toàn bộ nhu cầu viết script riêng cho từng định dạng.
+## Script thật đã tạo
+- `common/scripts/to-markdown/to_markdown.py` — convert 1 file hoặc cả thư mục input.
+- `common/scripts/to-markdown/requirements.txt` — `markitdown[all]`.
+- `common/scripts/to-markdown/README.md` — hướng dẫn dùng (đọc file này).
 
----
-
-## Mục tiêu kiến trúc (đúng ý Monitor)
-
-```
-Monitor đưa file (pdf/docx/xlsx/pptx...) vào input/
-        │
-        ▼
-[script convert: file → markdown]   ← chạy TRƯỚC
-        │
-        ▼
-Lưu .md vào input/ (hoặc input/_converted/)
-        │
-        ▼
-AI chỉ đọc file .md  ← tiết kiệm token, markdown là tối ưu cho AI ✅
-```
-
-**Vì sao markdown tốt nhất cho AI:** giữ cấu trúc ngữ nghĩa (heading/table/list) nhưng bỏ noise định dạng → ít token, dễ parse, ổn định hơn đọc trực tiếp pdf/xlsx nặng.
-
----
-
-## Cài đặt (đề xuất — CHỜ Monitor duyệt trước khi cài)
-
+## Cài đặt
 ```bash
 pip install "markitdown[all]"
 ```
 
-## Script wrapper đề xuất (chưa tạo file thật — chờ Monitor duyệt)
-`common/scripts/convert/to_markdown.py`:
-```python
-# Convert bất kỳ file nào sang markdown
-from markitdown import MarkItDown
-import sys, pathlib
-
-md = MarkItDown(enable_plugins=False)
-src = pathlib.Path(sys.argv[1])
-result = md.convert(str(src))
-out = src.with_suffix(".md")
-out.write_text(result.text_content, encoding="utf-8")
-print(f"✅ {src.name} → {out.name}")
+## Mục tiêu kiến trúc (đã đạt)
 ```
-Dùng: `python to_markdown.py input/yeu-cau.docx` → sinh `input/yeu-cau.md`.
+Đưa file (pdf/docx/xlsx/pptx...) vào input/ của job
+   → CALL to_markdown.py → sinh .md cạnh file gốc (không xóa/sửa gốc)
+   → AI chỉ đọc .md → tiết kiệm token
+```
+Markdown tối ưu cho AI: giữ cấu trúc (heading/table/list), bỏ noise, ít token, ổn định hơn đọc pdf/xlsx nặng.
 
----
+## Bật/tắt theo từng dự án & từng job
+- **Theo dự án:** `projects/{id}/project-config.json` → block `input_preprocessing.convert_to_markdown`.
+- **Theo job:** ghi `convert-md` trong trường `Tool:` của lệnh (xem `HUONG-DAN-GOI-JOB.md`). Không gọi → không convert. File đã là `.md` → bỏ qua.
 
-## So sánh các lựa chọn khác (tham khảo)
-| Thư viện | Định dạng | Ghi chú |
-|---|---|---|
-| **MarkItDown** (Microsoft) ⭐ khuyến nghị | 15+ | Phổ biến nhất, MIT, không GPU |
-| markitdown (conductor-oss) | 12 | Bản port Go nếu muốn binary |
-| file2md (ricky-clevi) | pdf/docx/xlsx/pptx | Bản Node.js (hợp nếu giữ hệ JS hiện có) |
-| marker (datalab-to) | PDF/PPTX/DOCX/XLSX | Độ chính xác cao, nặng hơn |
-
-> Repo hiện có sẵn 2 script JS (`convert-csv.js`, `convert-excel.js`). Nếu muốn đồng bộ hệ Node → cân nhắc **file2md** thay vì thêm Python. Monitor quyết hướng (Python MarkItDown hay Node file2md).
-
----
-
-## ⚠️ Trạng thái: ĐỀ XUẤT — chưa cài, chưa tạo script thật
-Chờ Monitor chọn: (a) Python MarkItDown, hay (b) Node file2md. Sau khi chọn, AI sẽ tạo script + tích hợp vào quy trình input của mỗi job.
+## Script JS cũ trong common/scripts/convert/
+`convert-csv.js`, `convert-excel.js`, `convert-txt-to-md.js` hardcode đường dẫn theo cấu trúc CŨ → không còn chạy đúng. Khuyến nghị thay bằng `to-markdown/`. Giữ hay xóa: Monitor quyết (chưa đụng).

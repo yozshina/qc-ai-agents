@@ -1,13 +1,10 @@
-# Projects — Giải thích kiến trúc & vai trò thư mục `knowledge/`
+# Projects — Kiến trúc & vai trò `projects/{id}/`
 
-> ⚠️ File này trả lời trực tiếp câu hỏi của Monitor:
-> *"Workflow tổng ở core không phụ thuộc project, vậy `projects/{id}/knowledge/` để làm gì? Lưu để đó có tác dụng gì?"*
+> Giải thích mô hình 2 lớp: `core/` (bộ não chung) vs `projects/{id}/` (ký ức riêng dự án).
 
 ---
 
-## Câu trả lời ngắn: Đúng là mô hình AGI 2 lớp
-
-Monitor đoán chính xác. Kiến trúc ở đây là:
+## Mô hình AGI 2 lớp
 
 ```
         ┌─────────────────────────────────────────┐
@@ -21,59 +18,62 @@ Monitor đoán chính xác. Kiến trúc ở đây là:
         │   projects/{id}/  =  "KÝ ỨC DỰ ÁN"      │
         │   - project-config.json: tham số dự án  │
         │   - knowledge/: tri thức TÍCH LŨY        │
+        │   - jobs/: artifact từng job             │
         │   KHÔNG chứa lại workflow/pipeline.       │
         └─────────────────────────────────────────┘
 ```
 
-**`knowledge/` KHÔNG chứa workflow/pipeline** (Monitor lo đúng — nếu chứa thì thừa). Nó chứa thứ mà workflow tổng KHÔNG thể biết trước: **tri thức riêng tích lũy được sau mỗi job của dự án đó.**
+`knowledge/` **không chứa workflow** — nó chứa thứ workflow tổng không thể biết trước: tri thức riêng tích lũy của dự án.
 
 ---
 
-## `knowledge/` chứa gì? (cấu trúc chuẩn — đề xuất)
+## Cấu trúc 1 dự án (thực tế hiện tại)
 
-| Loại file | Tên mẫu | Vai trò | Vì sao KHÔNG để ở core |
-|---|---|---|---|
-| **Pipeline summary** | `pipeline-summary_v{N}_{date}_{proj}_{job}.md` | "Ký ức" 1 job đã xong: scope, impact, số TC, baseline. Để job/CR sau đọc nhanh, không mở lại toàn bộ artifact. | Gắn chặt job cụ thể của dự án. |
-| **Kaizen job** | `kaizen_v{N}_{date}_{proj}_{job}.md` | Bài học sau khi chạy job đó (khác kaizen workflow ở `core/kaizen/`). | Bài học riêng dự án. |
-| **Domain knowledge** | `domain-knowledge_{proj}.md` | Glossary mở rộng, đặc thù nghiệp vụ, pattern Q&A lặp lại → feed ngược vào config. | Tri thức riêng dự án, lớn dần theo thời gian. |
-| **Regression baseline index** | `regression-index_{proj}.md` | Danh mục TC baseline tái dùng được giữa các job. | Chỉ đúng với dự án đó. |
+```
+projects/{id}/
+├── project-config.json          ← tham số dự án: domain, glossary, impact_map, risk,
+│                                   figma, input_preprocessing (bật/tắt convert), agent_rules
+├── knowledge/                   ← ký ức dự án (lớn dần qua từng job)
+│   ├── {id}-system-knowledge.md ← tri thức hệ thống dài hạn (LKH có)
+│   ├── domain-knowledge_{id}.md ← glossary + đặc thù nghiệp vụ + flow map
+│   └── {Sprint}/{job}/          ← bản ghi từng job
+│       └── job-record_{...}.md  ← 1 FILE GỘP/job (không tách rời nhiều file)
+└── jobs/                        ← artifact pipeline từng job
+    └── {Sprint}/{job}/
+        ├── 00_meta_...md
+        ├── input/   (figma.md + customer-description.md...)
+        ├── b1_extract/  b2_analysis/  b3_tcd/  b4_checkpoint/  b4_testcase/
+        └── ...
+```
 
-> **Chốt:** workflow tổng = "cách làm" (ở core). knowledge = "những gì đã học được khi làm dự án này" (ở project). Hai cái bổ sung nhau, không trùng.
+> **Nguyên tắc knowledge gọn:** mỗi job DONE → **1 file `job-record`** (gộp tóm tắt + bài học + trỏ artifact), KHÔNG tách 3-4 file rời để tránh rác và khó quản lý sau vài job.
 
 ---
 
-## Vì sao C360/knowledge đang rỗng?
+## `knowledge/` chứa gì?
 
-Vì C360 **chưa chạy job nào xong**. knowledge chỉ sinh ra SAU khi có job DONE → kaizen. Đang rỗng là ĐÚNG trạng thái, không phải lỗi. Khi job "Dashboard Sự kiện Truyền hình" chạy xong B5 → kaizen sẽ sinh file đầu tiên vào đây.
+| Loại | Tên | Vai trò |
+|---|---|---|
+| **System knowledge** | `{id}-system-knowledge.md` | Tri thức hệ thống dài hạn của dự án |
+| **Domain knowledge** | `domain-knowledge_{id}.md` | Glossary, đặc thù nghiệp vụ, flow map — lớn dần, feed ngược vào config |
+| **Job record** | `{Sprint}/{job}/job-record_{...}.md` | 1 file/job: tóm tắt job + impact + baseline + bài học |
 
-## LKH/knowledge đã có gì?
-3 file (pipeline-summary, kaizen, review_v0 pointer) vì LKH đã chạy xong 1 job (240 TC).
+> core = "cách làm". knowledge = "đã học được gì khi làm dự án này". Bổ sung nhau, không trùng.
 
 ---
 
-## Đề xuất bổ sung (chờ Monitor duyệt)
-Có nên thêm `domain-knowledge_{proj}.md` ngay từ đầu mỗi dự án (điền dần) thay vì chờ job xong? Lợi: gom glossary + đặc thù nghiệp vụ sớm → giảm Q&A lặp. Đây là đề xuất, chưa tạo.
+## Tên file trong jobs/ — theo logic comment/version (giống core/kaizen)
+- Artifact: `{step}_v{N}_{date}_{project}_{job}.md`
+- Bản Monitor comment: thêm hậu tố `_comment-by-monitor` (xem `core/kaizen/README_kaizen-workflow.md`).
+- Áp dụng nhất quán cho b1_extract, b2_analysis, b3_tcd, b4_*.
 
+---
 
---------------> Comment <---------------
-1. Đề xuất bổ sung (chờ Monitor duyệt)
-Có nên thêm `domain-knowledge_{proj}.md` ngay từ đầu mỗi dự án (điền dần) thay vì chờ job xong? Lợi: gom glossary + đặc thù nghiệp vụ sớm → giảm Q&A lặp. Đây là đề xuất, chưa tạo. -> Tạo luôn, đưa ví dụ để người monitor xử lý ngay lập tức
+## Testcase template của dự án
+Mỗi dự án có template TC riêng (đúng template khách cung cấp, vd Viettel KBKT cho LKH). Job sau BẮT BUỘC sinh TC đúng template đó. Vị trí: trong `projects/{id}/` (templates của dự án). Lý do: TC sai template làm Monitor mất công sửa tay.
 
-2. LKH/knowledge đã có gì?
-3 file (pipeline-summary, kaizen, review_v0 pointer) vì LKH đã chạy xong 1 job (240 TC).
-Nếu để như này sẽ là rác sau 2-3 job nữa, sau này người monitor biết đc file nào? AI biết nên đọc cái gì cái nào ko???? cấu trúc lại file xem, job 1 của LKH -> thì chỉ nên lưu lại những gì? (Đề xuất)  Và chỉ cho vào chung 1 file thôi, ko thể tạo thành 3 file được lsao có thể quản lý đc??? File name cũng phải chuẩn chỉ
+---
 
-3. Đi sâu vào trong cấu trúc file của job
-+ input: Tương đối đúng ý nhưng tên file cần thay đổi, chỉ cần lưu là figma (vì url sẽ đc lưu vào file project-config), kiểm tra xem 2 file đã lưu đầy đủ thông tin chưa, tất nhiên phải lưu lại để người monitor có thể truy vết lại sau mỗi job, không loại trừ trường hợp nhầm link, sai link, nhầm file chả hạn
-+ b1_extract: đúng rồi nhưng tên file lưu lại -> file comment sẽ tương tự logic bên phần core đã được hướng dẫn tại file README_kaizen-workflow.md 
-+ áp dung cho b2, b3, b4 cũng như vậy về logic tên file
-
-4. Folder testcase template của mỗi project đâu? Kiến trúc bị kém tắm à?
-** QUAN TRỌNG: YÊU CẦU AI AGENTS THỰC THI VIÊT LẠI TESTCASE TEMPLATE THEO TEMPLATE ĐÃ ĐƯỢC NGƯỜI MONITOR CUNG CẤP (quy tắc là đúng cấu trúc 100% và bắt buộc job sau AI phải sinh ra Testcase theo đúng Template đó được) (hiện tại có template testcase của dự án LKH, thực hiện xong lưu thẳng vào folder của dự án LKH để tôi review trước) **
-Lý do: Testcase cũ sinh ra sai template, kiến tôi mất thời gian để sửa lại theo đúng template!
-
-5. Folder Common:
-+ Tại sao vẫn còn folder config, file project-config -> Có còn cần thiết, nếu ko thực hiện xóa đi tránh rác folder common
-+ Tại sao vẫn còn folder processes, và file QC_AI_Workflow_Lakehouse_v1.md trong đó? -> File này đã được lưu lại vào đâu? (đây là file quan trọng, chính là workflow đầu tiên được áp dung cho JOB 1 của LKH). Đã thực hiện theo kiến trúc được comment ở folder README_kaizen-workflow.md hay chưa? Nếu chưa thì thực hiện ngay và kiếm tra kỹ file có bị thay đổi nội dung nếu đã được di chuyển hay ko? Nếu ko còn giá trị gì cũng xóa đi tránh rách chứ???
-+ folder scripts tôi cần thêm các scripts để có thể convert nhiều định dạng khác sang MD, thực hiện kiểm tra trên GitHub xem có repo nào mới hỗ trợ đc cái này không, để tránh việc phải tạo nhiều scripts chẳng hạn. Ngoài ra dựa có cấu trúc folder/file đc thiết kế. Làm sao để mỗi dự án, mỗi job tôi chỉ đưa file vào input, thực hiện convert sang markdown trước, lưu lại rồi AI mới đọc file markdown đó. Mục tiêu: Để AI đọc file markdown tránh đốt token vào các định dạng nặng khác và file markdown là tốt nhất cho AI có đúng ko?
-+ Folder templates xử lý xong việc ở phần 4 đã comment thì thực hiện xóa đi thôi vì còn tác dụng đâu đúng ko?
+## Trạng thái hiện tại
+- **LKH:** đã chạy 1 job (Sprint 14, 240 TC) → có `job-record`, `domain-knowledge`, `system-knowledge`.
+- **C360:** chưa chạy job nào → knowledge mới có `domain-knowledge` (mẫu, điền dần). Đúng trạng thái.

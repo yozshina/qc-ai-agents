@@ -21,13 +21,15 @@
 ```
 core/kaizen/
 ├── README_kaizen-workflow.md          ← file này
-├── v1/                                ← file liên quan xây workflow ĐẦU TIÊN (eContract origin)
-│   ├── kaizen-workflow_eContract_origin_v1_2026-06-17.md
-│   └── kaizen-workflow_eContract_review-and-comment_v1.md
+├── v1/                                ← file liên quan xây workflow ĐẦU TIÊN (eContract → LKH)
+│   ├── kaizen-workflow_expect-LKH.md
+│   ├── QC_AI_Workflow_Lakehouse_v1-comment-by-monitor.md
+│   └── QC_AI_Workflow_Lakehouse_v2.md
 └── v2/                                ← file liên quan xây workflow v2 (sau job 1 LKH)
-    ├── kaizen-workflow_LKH_sprint14_v1_2026-06-20+comment-by-monitor.md
-    ├── kaizen-workflow_LKH_sprint14_v2_2026-06-23.md
-    └── kaizen-workflow_LKH_sprint14_v2_2026-06-24+comment-by-monitor-senior-qc.md
+    ├── kaizen-workflow_LKH_Sprint14_update-common-rule-UI_v1_20-06-2026.md
+    ├── kaizen-workflow_LKH_Sprint14_update-common-rule-UI_v1_20-06-2026_comment-by-monitor.md
+    ├── kaizen-workflow_LKH_Sprint14_update-common-rule-UI_v2_23-06-2026.md
+    └── kaizen-workflow_LKH_Sprint14_update-common-rule-UI_v2_24-06-2026_comment-by-monitor.md
 ```
 
 ---
@@ -61,12 +63,12 @@ core/kaizen/
 
 ---
 
-## 4. File workflow đang chạy (core/pipeline/)
+## 4. File workflow đang chạy (core/workflow/)
 
-> Khi chạy job mới, **chỉ cần gọi file workflow MỚI NHẤT trong `core/pipeline/`**. Không cần đụng kaizen.
+> Khi chạy job mới, **chỉ cần gọi file workflow MỚI NHẤT trong `core/workflow/`**. Không cần đụng kaizen.
 
-- Hiện tại: `core/pipeline/qc-workflow_core_v3_2026-06-25.md`
-  *(⚠️ tên này theo quy ước cũ. Lần kaizen tới sẽ đổi sang chuẩn `QC-AI-AGENTS-workflow_{version}_{date}.md`.)*
+- Hiện tại: `core/workflow/QC-AI-AGENTS_WORKFLOW_v2_25-06-2026.md` (bản mới nhất).
+- Cách xác định "mới nhất": file có version/ngày cao nhất trong `core/workflow/`.
 - Folder `_archive/` đã **BỎ** (theo comment Monitor: đã lưu version qua mỗi kaizen thì archive là thừa).
 
 ---
@@ -79,10 +81,11 @@ core/kaizen/
 - File retrospective nằm trong `core/kaizen/{version}/`, tên:
   `kaizen-workflow_retrospective-{tên file workflow được bốc đi}.md`
   *(rút gọn — không nhồi projID+jobID vì tên quá dài; chỉ ghi version liên quan)*
-- Bản chất: các file sau `core/pipeline/` được lấy ra để kaizen workflow KHÔNG xuất phát từ project/job nữa, mà từ chính các version workflow.
+- Bản chất: các file sau `core/workflow/` được lấy ra để kaizen workflow KHÔNG xuất phát từ project/job nữa, mà từ chính các version workflow.
 
 ---
 
-## 6. Phân biệt với KNOWLEDGE dự án (đang chờ Monitor làm rõ — Phần D)
+## 6. Phân biệt với KNOWLEDGE dự án
 
-> ⚠️ Khái niệm "kaizen JOB" cũ đang được Monitor làm rõ lại. Theo comment, nó thực chất là **knowledge dự án** (vẽ luồng, cảnh báo vùng ảnh hưởng, điểm gãy logic), KHÔNG phải kaizen workflow. Phần đó nằm ở `projects/{id}/knowledge/`, sẽ tái cấu trúc sau khi Monitor giải thích thêm. File này CHỈ nói về kaizen workflow.
+> Kaizen WORKFLOW (file này) = cải tiến chính bản quy trình (v1→v2→...), ở `core/kaizen/`.
+> KNOWLEDGE dự án = tri thức riêng từng dự án (flow map, vùng ảnh hưởng, điểm gãy logic, bài học job), ở `projects/{id}/knowledge/`. Hai thứ tách riêng — xem `projects/_README_kien-truc-projects.md`.
